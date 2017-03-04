@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ug.jvm.json.JsonSyntaxBuilder.*;
+
 public class JsonSerializer {
 
     public String toJson(Object src) {
@@ -17,7 +19,8 @@ public class JsonSerializer {
             return jsonNullValue();
         }
 
-        return "{ " + fillFields(src) + " }";
+        // TODO: Support collections
+        return jsonObjectValue(fillFields(src));
     }
 
     private String fillFields(Object src) {
@@ -54,26 +57,19 @@ public class JsonSerializer {
         }
 
         if (BeanFieldUtils.isCollection(field)) {
-            return jsonCollectionValue((Collection) result);
+            return parseCollection((Collection) result);
         }
 
+        // TODO: Support for nested objects
         return result.toString();
     }
 
-    private String jsonCollectionValue(Collection<Object> collection) {
+    // TODO: Support for Collection of objects
+    private String parseCollection(Collection<Object> collection) {
         String collectionResult = collection.stream()
                 .map(Object::toString)
                 .collect(Collectors.joining(", "));
-        return "[" + collectionResult + "]";
+
+        return jsonArrayValue(collectionResult);
     }
-
-    private String jsonNullValue() {
-        return "null";
-    }
-
-    private String jsonStringValue(Object result) {
-        return "\"" + result + "\"";
-    }
-
-
 }
