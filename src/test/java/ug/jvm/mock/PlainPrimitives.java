@@ -4,6 +4,7 @@ public class PlainPrimitives {
     private int number;
     private long longNumber;
     private String string;
+    private boolean active;
 
     public int getNumber() {
         return number;
@@ -27,5 +28,13 @@ public class PlainPrimitives {
 
     public void setString(String string) {
         this.string = string;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
