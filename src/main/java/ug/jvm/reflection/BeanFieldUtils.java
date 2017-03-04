@@ -5,6 +5,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 public enum BeanFieldUtils {
     ;
@@ -13,7 +14,7 @@ public enum BeanFieldUtils {
             IntrospectionException,
             InvocationTargetException,
             IllegalAccessException {
-        Method method = BeanFieldUtils.buildGetter(field);
+        Method method = buildGetter(field);
 
         if (method == null) {
             throw new RuntimeException("Getter not found | field: " + field.getName());
@@ -35,5 +36,9 @@ public enum BeanFieldUtils {
     public static boolean isString(Field field) {
         Class<?> type = field.getType();
         return type.isAssignableFrom(String.class);
+    }
+
+    public static boolean isCollection(Field field) {
+        return Collection.class.isAssignableFrom(field.getType());
     }
 }

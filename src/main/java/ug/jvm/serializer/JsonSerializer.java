@@ -5,8 +5,8 @@ import ug.jvm.reflection.BeanFieldUtils;
 import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,7 +14,7 @@ public class JsonSerializer {
 
     public String toJson(Object src) {
         if (src == null) {
-            return "null";
+            return jsonNullValue();
         }
 
         return "{ " + fillFields(src) + " }";
@@ -47,13 +47,32 @@ public class JsonSerializer {
 
     private String buildFieldValue(Field field, Object result) {
         if (result == null) {
-            return "null";
+            return jsonNullValue();
         }
         if (BeanFieldUtils.isString(field)) {
-            return "\"" + result + "\"";
+            return jsonStringValue(result);
+        }
+
+        if (BeanFieldUtils.isCollection(field)) {
+            return jsonCollectionValue((Collection) result);
         }
 
         return result.toString();
+    }
+
+    private String jsonCollectionValue(Collection<Object> collection) {
+        String collectionResult = collection.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", "));
+        return "[" + collectionResult + "]";
+    }
+
+    private String jsonNullValue() {
+        return "null";
+    }
+
+    private String jsonStringValue(Object result) {
+        return "\"" + result + "\"";
     }
 
 
