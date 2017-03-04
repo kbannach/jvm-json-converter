@@ -17,7 +17,7 @@ public enum JsonSyntaxBuilder {
         return "" + STRING + result + STRING;
     }
 
-    public static String jsonObjectValue(Object result) {
+    public static String jsonObjectValue(String result) {
         return "" + OBJECT_START + result + OBJECT_END;
     }
 }

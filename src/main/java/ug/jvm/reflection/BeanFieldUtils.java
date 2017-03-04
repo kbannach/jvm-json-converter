@@ -28,8 +28,9 @@ public enum BeanFieldUtils {
         return new PropertyDescriptor(field.getName(), type).getReadMethod();
     }
 
-    public static boolean isPrimitive(Field field) {
+    public static boolean isJsonPrimitive(Field field) {
         Class<?> type = field.getType();
+        // TODO: Check if Long.class, int, long, Integer.class, boolean works here
         return type.isAssignableFrom(Number.class) || type.isAssignableFrom(Boolean.class);
     }
 
