@@ -1,6 +1,7 @@
-package ug.jvm.api;
+package ug.jvm;
 
 import junit.framework.TestCase;
+
 import static org.assertj.core.api.Assertions.*;
 
 public class JsonConverterTest extends TestCase {
