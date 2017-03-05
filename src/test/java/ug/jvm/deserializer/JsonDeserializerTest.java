@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import junit.framework.TestCase;
 import ug.jvm.mock.PlainPrimitives;
-import util.ReflectionUtils;
+import ug.jvm.util.ReflectionUtils;
 
 public class JsonDeserializerTest extends TestCase {
 
@@ -47,7 +47,7 @@ public class JsonDeserializerTest extends TestCase {
          assertThat(list.get(2)).isEqualTo("active: true");
          assertThat(list.get(3)).isEqualTo("string: \"Moon Trance\"");
       } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-         assertTrue("Exception occured: " + e.getMessage(), false);
+         assertTrue("Exception occured: " + e.getClass().getName() + ": " + e.getMessage(), false);
       }
    }
 
@@ -60,5 +60,41 @@ public class JsonDeserializerTest extends TestCase {
       assertThat(map.get("longNumber")).isEqualTo("1337");
       assertThat(map.get("active")).isEqualTo("true");
       assertThat(map.get("string")).isEqualTo("\"Moon Trance\"");
+   }
+
+   public void testConvertingJsonWithArrayToMap() {
+      // arrange
+      String json = //
+      "{ " + //
+            "number: 1, " + //
+            "longNumber: 1337, " + //
+            "active: true, " + //
+            "string: \"Moon Trance\", " + //
+            "array: [1, 2, 3]" + //
+            "}";
+      // act
+      Map<String, String> map = JsonToStringMapConverter.convert(json);
+      // assert
+      assertThat(map.size()).isEqualTo(5);
+      assertThat(map.get("number")).isEqualTo("1");
+      assertThat(map.get("longNumber")).isEqualTo("1337");
+      assertThat(map.get("active")).isEqualTo("true");
+      assertThat(map.get("string")).isEqualTo("\"Moon Trance\"");
+      assertThat(map.get("array")).isEqualTo("[1, 2, 3]");
+   }
+
+   public void testConvertingJsonWithObjectToMap() {
+      // arrange
+      String json = //
+      "{ " + //
+            "number: 1, " + //
+            "object: { test: 123 }" + //
+            "}";
+      // act
+      Map<String, String> map = JsonToStringMapConverter.convert(json);
+      // assert
+      assertThat(map.size()).isEqualTo(2);
+      assertThat(map.get("number")).isEqualTo("1");
+      assertThat(map.get("object")).isEqualTo("{ test: 123 }");
    }
 }
