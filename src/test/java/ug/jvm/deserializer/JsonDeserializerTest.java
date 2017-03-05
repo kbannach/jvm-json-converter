@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import junit.framework.TestCase;
+import ug.jvm.mock.NestedObject;
 import ug.jvm.mock.PlainPrimitives;
 import ug.jvm.util.ReflectionUtils;
 
@@ -96,5 +97,24 @@ public class JsonDeserializerTest extends TestCase {
       assertThat(map.size()).isEqualTo(2);
       assertThat(map.get("number")).isEqualTo("1");
       assertThat(map.get("object")).isEqualTo("{ test: 123 }");
+   }
+
+   public void testParsingJsonWithNestedObject() {
+      // arrange
+      String json = //
+      "{ " + //
+            "id: 111, " + //
+            "plainPrimitives: " + jsonWithPrimitives_1 + //
+            "}";
+      JsonDeserializer jsonDeserializer = new JsonDeserializer();
+      // act
+      NestedObject nestedObject = jsonDeserializer.fromJson(json, NestedObject.class);
+      // assert
+      assertThat(nestedObject).isNotNull().isInstanceOf(NestedObject.class);
+      assertThat(nestedObject.getId()).isEqualTo(111);
+      assertThat(nestedObject.getPlainPrimitives().getNumber()).isEqualTo(1);
+      assertThat(nestedObject.getPlainPrimitives().getLongNumber()).isEqualTo(1337L);
+      assertThat(nestedObject.getPlainPrimitives().getString()).isEqualTo("Moon Trance");
+      assertThat(nestedObject.getPlainPrimitives().isActive()).isTrue();
    }
 }
