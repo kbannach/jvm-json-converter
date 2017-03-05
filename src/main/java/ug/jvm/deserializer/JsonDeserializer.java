@@ -8,7 +8,6 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import ug.jvm.json.JsonSyntax;
 import ug.jvm.json.JsonSyntaxNotValidException;
@@ -16,19 +15,36 @@ import ug.jvm.reflection.BeanFieldUtils;
 
 public class JsonDeserializer {
 
-   private static Map<String, Class< ? >> PRIMITIVE_TYPES_MAP = new HashMap<String, Class< ? >>() {
+   private enum PRIMITIVE_TYPES_MAP {
+         BOOLEAN("boolean", Boolean.class),
+         BYTE("byte", Byte.class),
+         CHAR("char", Character.class),
+         SHORT("short", Short.class),
+         INT("int", Integer.class),
+         LONG("long", Long.class),
+         FLOAT("float", Float.class),
+         DOUBLE("double", Double.class);
 
-                                                                 {
-                                                                    put("boolean", Boolean.class);
-                                                                    put("byte", Byte.class);
-                                                                    put("char", Character.class);
-                                                                    put("short", Short.class);
-                                                                    put("int", Integer.class);
-                                                                    put("long", Long.class);
-                                                                    put("float", Float.class);
-                                                                    put("double", Double.class);
-                                                                 }
-                                                              };
+      private String     name;
+      private Class< ? > javaType;
+
+      private PRIMITIVE_TYPES_MAP(String name, Class< ? > cls) {
+         this.name = name;
+         this.javaType = cls;
+      }
+
+      /**
+       * returns a Class object representation of a primitive of given name
+       */
+      public static final Class< ? > get(String name) {
+         for (PRIMITIVE_TYPES_MAP v : values()) {
+            if (v.name.equals(name)) {
+               return v.javaType;
+            }
+         }
+         return null;
+      }
+   }
 
    public <T> T fromJson(String json, Class<T> type) {
       json = json.trim();
@@ -85,6 +101,7 @@ public class JsonDeserializer {
          fieldType = PRIMITIVE_TYPES_MAP.get(f.getType().getName());
       }
       if (fieldType.equals(String.class)) {
+         // remove quotes for strings
          newValueStr = ((String) newValueStr).substring(1, ((String) newValueStr).length() - 1);
       }
       return fieldType.getConstructor(String.class).newInstance(newValueStr);
