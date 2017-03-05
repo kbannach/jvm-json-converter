@@ -51,8 +51,10 @@ public class JsonDeserializer {
                continue;
             } else if (newValueStr.startsWith("[")) {
                // TODO
+               continue;
             } else if (newValueStr.startsWith("{")) {
                // TODO
+               continue;
             }
             setSimpleNewValue(f, newValueStr, instance);
          }
