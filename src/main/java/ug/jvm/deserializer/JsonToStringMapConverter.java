@@ -27,11 +27,11 @@ public abstract class JsonToStringMapConverter {
    private static List<String> getItems(String json) {
       List<String> items = new ArrayList<String>();
       int lastCommaPos = 0;
-      for (int pos = 0; pos < json.length(); pos++) {
+      for (int pos = 1; pos < json.length(); pos++) {
          // searches for ',', '}', ,'"', '[' or '{' characters and:
-         // adds part of the json between previous and current ',' character (for ',' and '}')
-         // skips to a ']' character (for '[') or
-         // skips to '}' character (for '{')
+         // - adds part of the json between previous and current ',' character (for ',' and '}')
+         // - skips to a ']' character (for '[') or
+         // - skips to '}' character (for '{')
          if (json.charAt(pos) == ',' || json.charAt(pos) == '}') {
             items.add(json.substring(lastCommaPos + 1, pos).trim());
             lastCommaPos = pos;
@@ -52,8 +52,8 @@ public abstract class JsonToStringMapConverter {
          if (pos == json.length()) {
             throw new JsonSyntaxNotValidException("Value syntax not valid.\n Json: " + json);
          }
-      } while (json.charAt(pos) == skipTo);
-      return pos + 1;
+      } while (json.charAt(pos) != skipTo);
+      return pos;
    }
 
    /**
