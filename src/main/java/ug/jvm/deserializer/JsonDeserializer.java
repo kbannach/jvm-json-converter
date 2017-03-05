@@ -66,13 +66,12 @@ public class JsonDeserializer {
             if (newValueStr == null) {
                continue;
             } else if (newValueStr.startsWith("[")) {
-               // TODO
-               continue;
+               setCollectionValue(f, newValueStr, instance);
             } else if (newValueStr.startsWith("{")) {
-               // TODO
-               continue;
+               setObjectValue(f, newValueStr, instance);
+            } else {
+               setSimpleValue(f, newValueStr, instance);
             }
-            setSimpleNewValue(f, newValueStr, instance);
          }
          return instance;
       } catch (InstantiationException | IllegalAccessException | IntrospectionException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -80,21 +79,34 @@ public class JsonDeserializer {
       }
    }
 
+   private void setCollectionValue(Field f, String newValueStr, Object instance) {
+      // TODO Auto-generated method stub
+   }
+
    /**
-    * Builds {@code f} field setter and invokes it with a {@code newValue} as a
-    * parameter. If {@code f} is a primitive type field, then its value is set
+    * Builds {@code f} field setter and invokes it with an object parsed from
+    * {@code newValueStr} json as a parameter.
+    */
+   private void setObjectValue(Field f, String newValueStr, Object instance) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      Method setter = BeanFieldUtils.buildSetter(f);
+      setter.invoke(instance, fromJson(newValueStr, f.getType()));
+   }
+
+   /**
+    * Builds {@code f} field setter and invokes it with a {@code newValueStr} as
+    * a parameter. If {@code f} is a primitive type field, then its value is set
     * by a boxed parameter.
     */
-   private void setSimpleNewValue(Field f, String newValueStr, Object instance) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+   private void setSimpleValue(Field f, String newValueStr, Object instance) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
          InstantiationException, NoSuchMethodException, SecurityException {
       Method setter = BeanFieldUtils.buildSetter(f);
-      setter.invoke(instance, getObjectValue(f, newValueStr));
+      setter.invoke(instance, buildObjectValue(f, newValueStr));
    }
 
    /**
     * parses {@code newValueStr} using a field type's constructor
     */
-   private Object getObjectValue(Field f, String newValueStr) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
+   private Object buildObjectValue(Field f, String newValueStr) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
          SecurityException {
       Class< ? > fieldType = f.getType();
       if (fieldType.isPrimitive()) {
