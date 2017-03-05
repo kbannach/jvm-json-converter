@@ -1,4 +1,4 @@
-package util;
+package ug.jvm.util;
 
 public class ReflectionException extends RuntimeException {
 

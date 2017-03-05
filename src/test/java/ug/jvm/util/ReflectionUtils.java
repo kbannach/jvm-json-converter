@@ -1,8 +1,9 @@
-package util;
+package ug.jvm.util;
 
 import java.lang.reflect.Method;
 
-public abstract class ReflectionUtils {
+public enum ReflectionUtils {
+   ;
 
    public static Method getPrivateMethod(Class< ? > clazz, String methodName, Class< ? >... params) {
       try {
