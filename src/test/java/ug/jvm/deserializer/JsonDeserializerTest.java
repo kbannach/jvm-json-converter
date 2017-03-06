@@ -10,6 +10,7 @@ import ug.jvm.mock.NestedObject;
 import ug.jvm.mock.PlainPrimitives;
 import ug.jvm.util.ReflectionUtils;
 
+// TODO kbannach add some tests (primitives, nested objects, recursive objects)
 public class JsonDeserializerTest extends TestCase {
 
    private final String jsonWithPrimitives_1 = //
@@ -33,28 +34,52 @@ public class JsonDeserializerTest extends TestCase {
       assertThat(plainPrimitives.isActive()).isTrue();
    }
 
-   public void testGetItemsMethod() {
-      try {
-         // arrange
-         Method method = ReflectionUtils.getPrivateMethod(JsonToStringMapConverter.class, "getItems", String.class);
-         method.setAccessible(true);
-         // act
-         @SuppressWarnings("unchecked")
-         List<String> list = (List<String>) method.invoke(null, this.jsonWithPrimitives_1);
-         // assert
-         assertThat(list.size()).isEqualTo(4);
-         assertThat(list.get(0)).isEqualTo("number: 1");
-         assertThat(list.get(1)).isEqualTo("longNumber: 1337");
-         assertThat(list.get(2)).isEqualTo("active: true");
-         assertThat(list.get(3)).isEqualTo("string: \"Moon Trance\"");
-      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-         assertTrue("Exception occured: " + e.getClass().getName() + ": " + e.getMessage(), false);
-      }
+   public void testGetItemsMethodWithJsonObject() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      // arrange
+      Class< ? > jsonTypeEnum = JsonToStringMapConverter.class.getDeclaredClasses()[0];
+      Object objectEnumValue = jsonTypeEnum.getEnumConstants()[0];
+      Method method = ReflectionUtils.getPrivateMethod(JsonToStringMapConverter.class, "getItems", String.class, jsonTypeEnum);
+      method.setAccessible(true);
+      // act
+      @SuppressWarnings("unchecked")
+      List<String> list = (List<String>) method.invoke(null, this.jsonWithPrimitives_1, objectEnumValue);
+      // assert
+      assertThat(list.size()).isEqualTo(4);
+      assertThat(list.get(0)).isEqualTo("number: 1");
+      assertThat(list.get(1)).isEqualTo("longNumber: 1337");
+      assertThat(list.get(2)).isEqualTo("active: true");
+      assertThat(list.get(3)).isEqualTo("string: \"Moon Trance\"");
+   }
+
+   public void testGetItemsMethodWithJsonArray() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+      // arrange
+      Class< ? > enumJSON_TYPE = JsonToStringMapConverter.class.getDeclaredClasses()[0];
+      Object arrayEnumValue = enumJSON_TYPE.getEnumConstants()[1];
+      Method method = ReflectionUtils.getPrivateMethod(JsonToStringMapConverter.class, "getItems", String.class, enumJSON_TYPE);
+      method.setAccessible(true);
+      String json = //
+      "[ " + //
+            "number: 1, " + //
+            "longNumber: 1337, " + //
+            "active: true, " + //
+            "string: \"Moon Trance\", " + //
+            "array: [1, 2, 3]" + //
+            "]";
+      // act
+      @SuppressWarnings("unchecked")
+      List<String> list = (List<String>) method.invoke(null, json, arrayEnumValue);
+      // assert
+      assertThat(list.size()).isEqualTo(5);
+      assertThat(list.get(0)).isEqualTo("number: 1");
+      assertThat(list.get(1)).isEqualTo("longNumber: 1337");
+      assertThat(list.get(2)).isEqualTo("active: true");
+      assertThat(list.get(3)).isEqualTo("string: \"Moon Trance\"");
+      assertThat(list.get(4)).isEqualTo("array: [1, 2, 3]");
    }
 
    public void testConvertingJsonToMap() {
       // act
-      Map<String, String> map = JsonToStringMapConverter.convert(this.jsonWithPrimitives_1);
+      Map<String, String> map = JsonToStringMapConverter.convertMap(this.jsonWithPrimitives_1);
       // assert
       assertThat(map.size()).isEqualTo(4);
       assertThat(map.get("number")).isEqualTo("1");
@@ -74,7 +99,7 @@ public class JsonDeserializerTest extends TestCase {
             "array: [1, 2, 3]" + //
             "}";
       // act
-      Map<String, String> map = JsonToStringMapConverter.convert(json);
+      Map<String, String> map = JsonToStringMapConverter.convertMap(json);
       // assert
       assertThat(map.size()).isEqualTo(5);
       assertThat(map.get("number")).isEqualTo("1");
@@ -92,7 +117,7 @@ public class JsonDeserializerTest extends TestCase {
             "object: { test: 123 }" + //
             "}";
       // act
-      Map<String, String> map = JsonToStringMapConverter.convert(json);
+      Map<String, String> map = JsonToStringMapConverter.convertMap(json);
       // assert
       assertThat(map.size()).isEqualTo(2);
       assertThat(map.get("number")).isEqualTo("1");
