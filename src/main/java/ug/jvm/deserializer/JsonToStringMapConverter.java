@@ -28,7 +28,7 @@ public abstract class JsonToStringMapConverter {
    private static List<String> getItems(String json, JSON_TYPE type) {
       validate(json, type);
       char endingChar = type.equals(JSON_TYPE.OBJECT) ? '}' : ']';
-      List<String> items = new ArrayList<String>();
+      List<String> items = new ArrayList<>();
       int lastCommaPos = 0;
       for (int pos = 1; pos < json.length(); pos++) {
          // searches for ',', '}', ,'"', or '[' characters and:
@@ -78,7 +78,7 @@ public abstract class JsonToStringMapConverter {
    }
 
    private static Map<String, String> convertItemsToMap(List<String> items) {
-      Map<String, String> map = new HashMap<String, String>(items.size());
+      Map<String, String> map = new HashMap<>(items.size());
       for (String item : items) {
          int commaIdx = item.indexOf(':');
          if (commaIdx == -1) {

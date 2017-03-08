@@ -124,7 +124,7 @@ public class JsonDeserializer {
     * @return &lt;field name&gt; : &lt;string representing field value&gt; map
     */
    private Map<String, String> fetchMapFromJson(String json) {
-      return JsonToStringMapConverter.convert(json);
+      return JsonToStringMapConverter.convertMap(json);
    }
 
    private boolean wraps(String json, JsonSyntax startsWithElement, JsonSyntax endsWithElement) {

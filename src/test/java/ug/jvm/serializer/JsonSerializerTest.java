@@ -5,6 +5,7 @@ import ug.jvm.mock.CollectionPrimitives;
 import ug.jvm.mock.PlainPrimitives;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,6 +49,21 @@ public class JsonSerializerTest extends TestCase {
         assertThat(json).isEqualTo(
                 "{ list: [1, 2, 3, 4, 1337] }"
         );
+    }
+
+    public void testCollectionOfPrimitives() throws Exception {
+        // arrange
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        List<Number> listOfNumbers = Arrays.asList(1, 2, 3, 4, 1337);
+        List<String> listOfStrings = Arrays.asList("hey", "go", "sleep", "it's", "1am");
+
+        // act
+        String jsonArrayNumbers = jsonSerializer.toJson(listOfNumbers);
+        String jsonArrayString = jsonSerializer.toJson(listOfStrings);
+
+        // assert
+        assertThat(jsonArrayNumbers).isEqualTo("[1, 2, 3, 4, 1337]");
+        assertThat(jsonArrayString).isEqualTo("[\"hey\", \"go\", \"sleep\", \"it's\", \"1am\"]");
     }
 
     private PlainPrimitives mockPlainPrimitives(int number, long longNumber, String s) {

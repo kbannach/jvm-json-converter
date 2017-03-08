@@ -18,6 +18,10 @@ public class JsonSerializer {
         if (src == null) {
             return jsonNullValue();
         }
+        if (src instanceof Collection<?>){
+            Collection<?> collection = (Collection<?>) src;
+            return new JsonArraySerializer().serialize(collection);
+        }
 
         // TODO: Support collections
         return jsonObjectValue(fillFields(src));
@@ -25,6 +29,7 @@ public class JsonSerializer {
 
     private String fillFields(Object src) {
         Class<?> aClass = src.getClass();
+
         List<Field> fields = Arrays.asList(aClass.getDeclaredFields());
         return fields.stream()
                 .map(field -> field.getName() + ": " + stringFieldValue(field, src))
