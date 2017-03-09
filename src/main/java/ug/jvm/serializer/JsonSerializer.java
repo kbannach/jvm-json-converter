@@ -60,12 +60,13 @@ public class JsonSerializer {
         if (BeanFieldUtils.isString(field)) {
             return jsonStringValue(result);
         }
-
+        if (BeanFieldUtils.isObject(field)) {
+            return toJson(result);
+        }
         if (BeanFieldUtils.isCollection(field)) {
             return parseCollection((Collection) result);
         }
 
-        // TODO: Support for nested objects
         return result.toString();
     }
 

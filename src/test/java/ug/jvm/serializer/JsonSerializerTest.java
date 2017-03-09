@@ -1,7 +1,9 @@
 package ug.jvm.serializer;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import junit.framework.TestCase;
 import ug.jvm.mock.CollectionPrimitives;
+import ug.jvm.mock.NestedObject;
 import ug.jvm.mock.PlainPrimitives;
 
 import java.util.Arrays;
@@ -36,6 +38,23 @@ public class JsonSerializerTest extends TestCase {
         );
     }
 
+    public void testNestedObject() throws Exception {
+        // arrange
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        PlainPrimitives object = mockPlainPrimitives(256, 1L, "Hey jude");
+        NestedObject nestedObject = new NestedObject();
+        nestedObject.setId(13);
+        nestedObject.setPlainPrimitives(object);
+
+        // act
+        String json = jsonSerializer.toJson(nestedObject);
+
+        // assert
+        assertThat(json).isEqualTo(
+                "{id: 13, plainPrimitives: {number: 256, longNumber: 1, string: \"Hey jude\", active: true}}"
+        );
+    }
+
     public void testPrimitiveCollection() throws Exception {
         // arrange
         JsonSerializer jsonSerializer = new JsonSerializer();
@@ -64,6 +83,24 @@ public class JsonSerializerTest extends TestCase {
         // assert
         assertThat(jsonArrayNumbers).isEqualTo("[1, 2, 3, 4, 1337]");
         assertThat(jsonArrayString).isEqualTo("[\"hey\", \"go\", \"sleep\", \"it's\", \"1am\"]");
+    }
+
+    @Ignore
+    public void testCollectionOfObjects() throws Exception {
+        // arrange
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        List<PlainPrimitives> listOfObjects = Arrays.asList(
+                mockPlainPrimitives(1, 2L, "First"),
+                mockPlainPrimitives(3, 4L, "Second")
+        );
+
+        // act
+        String json = jsonSerializer.toJson(listOfObjects);
+
+        // assert
+        assertThat(json).isEqualTo(
+                "[{ number: 1, longNumber: 2, string: \"First\", active: true },{ number: 3, longNumber: 4, string: \"Second\", active: true }]"
+        );
     }
 
     private PlainPrimitives mockPlainPrimitives(int number, long longNumber, String s) {
