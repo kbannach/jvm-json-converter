@@ -37,11 +37,14 @@ public enum BeanFieldUtils {
     }
 
     public static boolean isObject(Field field) {
-        return !isString(field) && !isJsonPrimitive(field) && !isCollection(field);
+        return !isString(field) && !isNumber(field) && !isCollection(field);
     }
 
-    public static boolean isJsonPrimitive(Field field) {
-        Class<?> type = field.getType();
+    public static boolean isNumber(Field field) {
+        return isNumber(field.getType());
+    }
+
+    public static boolean isNumber(Class<?> type) {
         return type.isPrimitive() || isWrapperType(type);
     }
 
@@ -54,13 +57,11 @@ public enum BeanFieldUtils {
         return Collection.class.isAssignableFrom(field.getType());
     }
 
-    public static boolean isWrapperType(Class<?> clazz)
-    {
+    public static boolean isWrapperType(Class<?> clazz) {
         return wrapperTypes.contains(clazz);
     }
 
-    private static Set<Class<?>> getWrapperTypes()
-    {
+    private static Set<Class<?>> getWrapperTypes() {
         Set<Class<?>> ret = new HashSet<>();
         ret.add(Boolean.class);
         ret.add(Character.class);

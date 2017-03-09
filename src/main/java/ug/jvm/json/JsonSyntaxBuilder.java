@@ -13,8 +13,12 @@ public enum JsonSyntaxBuilder {
         return JsonSyntax.NULL.toString();
     }
 
-    public static String jsonStringValue(Object result) {
-        return "" + STRING + result + STRING;
+    public static <T> String jsonNullValue(T object) {
+        return jsonNullValue();
+    }
+
+    public static <T> String jsonStringValue(T result) {
+        return "" + STRING + result.toString() + STRING;
     }
 
     public static String jsonObjectValue(String result) {

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static ug.jvm.json.JsonSyntaxBuilder.jsonArrayValue;
-import static ug.jvm.json.JsonSyntaxBuilder.jsonStringValue;
 
 public class JsonArraySerializer {
     public String serialize(Collection<?> collection) {
@@ -15,9 +14,7 @@ public class JsonArraySerializer {
     }
 
     private String parseField(Object object) {
-        if (object instanceof String) {
-            return jsonStringValue(object);
-        }
-        return object.toString();
+        return JsonStringifyFactory.factory(object)
+                .apply(object);
     }
 }

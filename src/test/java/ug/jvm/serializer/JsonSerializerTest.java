@@ -1,6 +1,5 @@
 package ug.jvm.serializer;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import junit.framework.TestCase;
 import ug.jvm.mock.CollectionPrimitives;
 import ug.jvm.mock.NestedObject;
@@ -34,7 +33,7 @@ public class JsonSerializerTest extends TestCase {
 
         // assert
         assertThat(json).isEqualTo(
-                "{ number: 256, longNumber: 1, string: \"Hey jude\", active: true }"
+                "{number: 256, longNumber: 1, string: \"Hey jude\", active: true}"
         );
     }
 
@@ -66,7 +65,7 @@ public class JsonSerializerTest extends TestCase {
 
         // assert
         assertThat(json).isEqualTo(
-                "{ list: [1, 2, 3, 4, 1337] }"
+                "{list: [1, 2, 3, 4, 1337]}"
         );
     }
 
@@ -85,7 +84,6 @@ public class JsonSerializerTest extends TestCase {
         assertThat(jsonArrayString).isEqualTo("[\"hey\", \"go\", \"sleep\", \"it's\", \"1am\"]");
     }
 
-    @Ignore
     public void testCollectionOfObjects() throws Exception {
         // arrange
         JsonSerializer jsonSerializer = new JsonSerializer();
@@ -99,7 +97,7 @@ public class JsonSerializerTest extends TestCase {
 
         // assert
         assertThat(json).isEqualTo(
-                "[{ number: 1, longNumber: 2, string: \"First\", active: true },{ number: 3, longNumber: 4, string: \"Second\", active: true }]"
+                "[{number: 1, longNumber: 2, string: \"First\", active: true}, {number: 3, longNumber: 4, string: \"Second\", active: true}]"
         );
     }
 
