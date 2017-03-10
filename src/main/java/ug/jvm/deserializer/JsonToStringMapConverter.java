@@ -80,6 +80,9 @@ public abstract class JsonToStringMapConverter {
    private static Map<String, String> convertItemsToMap(List<String> items) {
       Map<String, String> map = new HashMap<>(items.size());
       for (String item : items) {
+         if (item.trim().isEmpty()) {
+            continue;
+         }
          int commaIdx = item.indexOf(':');
          if (commaIdx == -1) {
             throw new JsonNotCompatibleException("No ':' character in a String representing a name:value pair.");
