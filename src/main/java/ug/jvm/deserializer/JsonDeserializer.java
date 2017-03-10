@@ -8,6 +8,7 @@ import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,15 +62,15 @@ public class JsonDeserializer {
       throw new JsonSyntaxNotValidException("First character is not an object.\n Json: " + json);
    }
 
-   private <T> List<T> deserializeCollection(Class<T> genericType, List<String> arrayStrings) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+   private <T> List<T> deserializeCollection(Class<T> genericTypesClass, List<String> arrayStrings) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
          InvocationTargetException, NoSuchMethodException, SecurityException {
       List<T> collection = new ArrayList<>(arrayStrings.size());
       for (String item : arrayStrings) {
          T itemObject;
-         if (genericType.isPrimitive() || BeanFieldUtils.isWrapperType(genericType)) {
-            itemObject = buildObjectValue(genericType, item);
+         if (genericTypesClass.isPrimitive() || BeanFieldUtils.isWrapperType(genericTypesClass)) {
+            itemObject = buildObjectValue(genericTypesClass, item);
          }
-         itemObject = fromJson(item, genericType);
+         itemObject = fromJson(item, genericTypesClass);
          collection.add(itemObject);
       }
       return collection;
@@ -80,7 +81,7 @@ public class JsonDeserializer {
          T instance = type.newInstance();
          for (Field f : type.getDeclaredFields()) {
             String newValueStr = nameValueStringMap.get(f.getName());
-            if (newValueStr == null) {
+            if (newValueStr == null || newValueStr.equalsIgnoreCase("null")) {
                continue;
             } else if (newValueStr.startsWith("[")) {
                setCollectionValue(f, newValueStr, instance);
@@ -91,7 +92,8 @@ public class JsonDeserializer {
             }
          }
          return instance;
-      } catch (InstantiationException | IllegalAccessException | IntrospectionException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+      } catch (InstantiationException | IllegalAccessException | IntrospectionException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException
+            | ClassNotFoundException e) {
          throw new RuntimeException("Error during deserialization.", e);
       }
    }
@@ -101,9 +103,15 @@ public class JsonDeserializer {
     * {@code newValueStr} json as a parameter.
     */
    private void setCollectionValue(Field f, String newValueStr, Object instance) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-         InstantiationException, NoSuchMethodException, SecurityException {
+         InstantiationException, NoSuchMethodException, SecurityException, ClassNotFoundException {
       Method setter = BeanFieldUtils.buildSetter(f);
-      setter.invoke(instance, deserializeCollection(f.getGenericType().getClass(), fetchArrayFromJson(newValueStr)));
+      setter.invoke(instance, deserializeCollection(getGenericTypesClass(f), fetchArrayFromJson(newValueStr)));
+   }
+
+   @SuppressWarnings("unchecked")
+   private <T> Class<T> getGenericTypesClass(Field f) throws ClassNotFoundException {
+      ParameterizedType pt = (ParameterizedType) f.getGenericType();
+      return (Class<T>) Class.forName(pt.getActualTypeArguments()[0].getTypeName());
    }
 
    /**
