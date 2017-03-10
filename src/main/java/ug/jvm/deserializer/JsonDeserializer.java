@@ -61,17 +61,17 @@ public class JsonDeserializer {
       throw new JsonSyntaxNotValidException("First character is not an object.\n Json: " + json);
    }
 
-// TODO add comments inside this method
-   @SuppressWarnings("unchecked")
-   private <T> List<T> deserializeCollection(Class<T> genericType, List<String> arrayStrings) {
+   private <T> List<T> deserializeCollection(Class<T> genericType, List<String> arrayStrings) throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+         InvocationTargetException, NoSuchMethodException, SecurityException {
       List<T> collection = new ArrayList<>(arrayStrings.size());
       for (String item : arrayStrings) {
-         if (BeanFieldUtils.isJsonPrimitive(field)) {
+         T itemObject;
+         if (genericType.isPrimitive() || BeanFieldUtils.isWrapperType(genericType)) {
+            itemObject = buildObjectValue(genericType, item);
          }
-         // TODO
-//            collection.add(e);
+         itemObject = fromJson(item, genericType);
+         collection.add(itemObject);
       }
-      // TODO
       return collection;
    }
 
@@ -100,7 +100,8 @@ public class JsonDeserializer {
     * Builds {@code f} field setter and invokes it with an object parsed from
     * {@code newValueStr} json as a parameter.
     */
-   private void setCollectionValue(Field f, String newValueStr, Object instance) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+   private void setCollectionValue(Field f, String newValueStr, Object instance) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+         InstantiationException, NoSuchMethodException, SecurityException {
       Method setter = BeanFieldUtils.buildSetter(f);
       setter.invoke(instance, deserializeCollection(f.getGenericType().getClass(), fetchArrayFromJson(newValueStr)));
    }
@@ -122,15 +123,15 @@ public class JsonDeserializer {
    private void setSimpleValue(Field f, String newValueStr, Object instance) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
          InstantiationException, NoSuchMethodException, SecurityException {
       Method setter = BeanFieldUtils.buildSetter(f);
-      setter.invoke(instance, buildObjectValue(f, newValueStr));
+      setter.invoke(instance, buildObjectValue(f.getType(), newValueStr));
    }
 
    /**
     * parses {@code newValueStr} using a field type's constructor
     */
-   private Object buildObjectValue(Field f, String newValueStr) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException,
-         SecurityException {
-      Class< ? > fieldType = getObjectTypeFromPrimitive(f.getType());
+   private <T> T buildObjectValue(Class<T> fieldType, String newValueStr) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+         NoSuchMethodException, SecurityException {
+      fieldType = getObjectTypeFromPrimitive(fieldType);
       if (fieldType.equals(String.class)) {
          // remove quotes for strings
          newValueStr = ((String) newValueStr).substring(1, ((String) newValueStr).length() - 1);
@@ -138,9 +139,10 @@ public class JsonDeserializer {
       return fieldType.getConstructor(String.class).newInstance(newValueStr);
    }
 
-   private Class< ? > getObjectTypeFromPrimitive(Class< ? > fieldType) {
+   @SuppressWarnings("unchecked")
+   private <T> Class<T> getObjectTypeFromPrimitive(Class<T> fieldType) {
       if (fieldType.isPrimitive()) {
-         fieldType = PRIMITIVE_TYPES_MAP.get(fieldType.getName());
+         fieldType = (Class<T>) PRIMITIVE_TYPES_MAP.get(fieldType.getName());
       }
       return fieldType;
    }
