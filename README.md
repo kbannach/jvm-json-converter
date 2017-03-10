@@ -25,7 +25,7 @@ Supports serialization Object to JSON or from JSON.
 
 ### Feautures
 
-#### Serialization - [Tests](./blob/master/src/test/java/ug/jvm/serializer/JsonSerializerTest.java)
+#### Serialization - [Tests](./src/test/java/ug/jvm/serializer/JsonSerializerTest.java)
 - Objects with primitive types and strings
 - Objects with collections
 - Collections of primitives and objects
@@ -33,7 +33,7 @@ Supports serialization Object to JSON or from JSON.
 - Handling nulls
 
 
-#### Deserialization - [Tests](./blob/master/src/test/java/ug/jvm/deserializer/JsonDeserializerTest.java)
+#### Deserialization - [Tests](./src/test/java/ug/jvm/deserializer/JsonDeserializerTest.java)
 
 - Objects with primitive types
 - Nested objects
