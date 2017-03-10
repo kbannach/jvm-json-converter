@@ -35,9 +35,10 @@ Supports serialization Object to JSON or from JSON.
 
 #### Deserialization - [Tests](./src/test/java/ug/jvm/deserializer/JsonDeserializerTest.java)
 
-- Objects with primitive types
+- Objects with primitive types and strings
+- Objects with collections
 - Nested objects
-- Collections of objects
+- Handling nulls
 
 ----
 #### Contributors
